@@ -12,6 +12,7 @@ Mountain bike suspension analysis for four-bar linkages
 
 * Automatic linkage configuration detection (linkage-driven single pivot, Horst link, Split-pivot, VPP, DW/Maestro link)
 * Plot rear axle path
+* :warning: Absolutely not accurate
 
 ![4bar_analysis.png](4bar_analysis.png)
 
