@@ -133,23 +133,23 @@ def new_angles_4bar(points_xy, theta1_new): # find links angles with new theta1
 
 def new_points_4bar(points_xy, theta1_new): # find points coordinates with new theta1
     (l1, l2, l3, l4) = l_4bar(points_xy)
-    
+
     (theta1_new, theta2_new, theta3_new, theta4_new) = new_angles_4bar(points_xy, theta1_new)
-    
+
     points_xy_new = np.zeros(points_xy.shape)
-    
+
     points_xy_new[0, :] = points_xy[0, :]
     points_xy_new[1, :] = points_xy_new[0, :]+[l1*math.cos(theta1_new), l1*math.sin(theta1_new)]
     points_xy_new[2, :] = points_xy_new[1, :]+[l2*math.cos(theta2_new), l2*math.sin(theta2_new)]
     points_xy_new[3, :] = points_xy[3, :]
-    
+
     return(points_xy_new)
 
 def ra_4bar(points_xy, theta1_new): # find rear axle coordinates from linkage points
     (l1, l2, l3, l4) = l_4bar(points_xy)
 
     (theta1_new, theta2_new, theta3_new, theta4_new) = new_angles_4bar(points_xy, theta1_new)
-    
+
     points_xy_new = new_points_4bar(points_xy, theta1_new)
 
     v2 = [points_xy[2, 0]-points_xy[1, 0], points_xy[2, 1]-points_xy[1, 1]] # l2 vector
@@ -157,8 +157,8 @@ def ra_4bar(points_xy, theta1_new): # find rear axle coordinates from linkage po
 
     a = np.linalg.norm(va) # distance to rear axle from lower chainstay/seatstay pivot
 
-    if a == 0: # avoid divide by 0 (Split-pivot configuration)
-        a = 1
+    if a == 0:
+        a = 1 # avoid divide by 0 (can happen in Split-pivot configuration)
 
     cos_alpha = (v2[0]*va[0]+v2[1]*va[1])/(l2*a) # l2 = norm(v2)
     sin_alpha = (v2[0]*va[1]-va[0]*v2[1])/(l2*a) # l2 = norm(v2)
@@ -177,7 +177,10 @@ def ic_4bar(points_xy): # find coordinates of instant center of rotation = inter
     b = (points_xy[3, 1]-points_xy[2, 1])/(points_xy[3, 0]-points_xy[2, 0]) # l3 slope
     d = points_xy[2, 1]-b*points_xy[2, 0] # l3 offset
 
-    ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)]
+    if a == b:
+        ic = [-1, -1] # avoid divide by 0 (should not happen...)
+    else:
+        ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)]
 
     return(ic)
 
@@ -213,7 +216,7 @@ plt.plot([points_xy[3, 0], points_xy[0, 0]], [points_xy[3, 1], points_xy[0, 1]],
 
 for theta1_new in np.linspace(theta1-math.radians(30), theta1+math.radians(30), 120): # y axis inverted = theta1 increases
     ra_xy = ra_4bar(points_xy, theta1_new)
-    
+
     plt.scatter(ra_xy[0], ra_xy[1], color = 'b', marker = '.')
 
 ## calculate and plot instant center of rotation
@@ -225,9 +228,9 @@ plt.plot([points_xy[3, 0], ic_xy[0]], [points_xy[3, 1], ic_xy[1]], color = 'b', 
 
 for theta1_new in np.linspace(theta1, theta1+math.radians(45), 90): # y axis inverted = theta1 increases
     points_xy_new = new_points_4bar(points_xy, theta1_new)
-    
+
     ic_xy = ic_4bar(points_xy_new)
-    
+
     plt.scatter(ic_xy[0], ic_xy[1], color = 'b', marker = '.')
 
 plt.xlim(xlim)
