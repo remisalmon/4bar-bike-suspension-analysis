@@ -70,10 +70,10 @@ def points_4bar(): # get linkage points coordinates from image
     return(points_xy)
 
 def l_4bar(points_xy): # find linkage lenghts from points
-    l1 = np.linalg.norm(points_xy[1, :]-points_xy[0, :]) # link 1 length (main pivot to lower chainstay/seatstay pivot)
-    l2 = np.linalg.norm(points_xy[2, :]-points_xy[1, :]) # link 2 length (lower chainstay/seatstay pivot to high chainstay pivot)
-    l3 = np.linalg.norm(points_xy[3, :]-points_xy[2, :]) # link 3 length (high chainstay to rocker pivot)
-    l4 = np.linalg.norm(points_xy[0, :]-points_xy[3, :]) # link 4 length (rocker pivot to main pivot)
+    l1 = np.linalg.norm(points_xy[1, :]-points_xy[0, :]) # link l1 length (main pivot to lower chainstay/seatstay pivot)
+    l2 = np.linalg.norm(points_xy[2, :]-points_xy[1, :]) # link l2 length (lower chainstay/seatstay pivot to high chainstay pivot)
+    l3 = np.linalg.norm(points_xy[3, :]-points_xy[2, :]) # link l3 length (high chainstay to rocker pivot)
+    l4 = np.linalg.norm(points_xy[0, :]-points_xy[3, :]) # link l4 length (rocker pivot to main pivot)
 
     return(l1, l2, l3, l4)
 
@@ -170,6 +170,17 @@ def ra_4bar(points_xy, theta1_new): # find rear axle coordinates from linkage po
 
     return(x, y)
 
+def ic_4bar(points_xy): # find coordinates of instant center of rotation = intersection of the 2 rotating links l1, l3
+    # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_the_equations_of_the_lines
+    a = (points_xy[1, 1]-points_xy[0, 1])/(points_xy[1, 0]-points_xy[0, 0]) # l1 slope
+    c = points_xy[0, 1]-a*points_xy[0, 0] # l1 offset
+    b = (points_xy[3, 1]-points_xy[2, 1])/(points_xy[3, 0]-points_xy[2, 0]) # l3 slope
+    d = points_xy[2, 1]-b*points_xy[2, 0] # l3 offset
+
+    ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)]
+
+    return(ic)
+
 # main
 # read and show image
 image_files = glob.glob('*.jpg')+glob.glob('*.jpeg')
@@ -204,3 +215,22 @@ for theta1_new in np.linspace(theta1-math.radians(30), theta1+math.radians(30), 
     ra_xy = ra_4bar(points_xy, theta1_new)
     
     plt.scatter(ra_xy[0], ra_xy[1], color = 'b', marker = '.')
+
+## calculate and plot instant center of rotation
+ic_xy = ic_4bar(points_xy)
+
+plt.scatter(ic_xy[0], ic_xy[1], color = 'b', marker = 'o')
+plt.plot([points_xy[0, 0], ic_xy[0]], [points_xy[0, 1], ic_xy[1]], color = 'b', linestyle = '--')
+plt.plot([points_xy[3, 0], ic_xy[0]], [points_xy[3, 1], ic_xy[1]], color = 'b', linestyle = '--')
+
+for theta1_new in np.linspace(theta1, theta1+math.radians(45), 90): # y axis inverted = theta1 increases
+    points_xy_new = new_points_4bar(points_xy, theta1_new)
+    
+    ic_xy = ic_4bar(points_xy_new)
+    
+    plt.scatter(ic_xy[0], ic_xy[1], color = 'b', marker = '.')
+
+plt.xlim(xlim)
+plt.ylim(ylim)
+
+plt.savefig('4bar_analysis.png')
