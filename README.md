@@ -11,8 +11,8 @@ Mountain bike suspension analysis for four-bar linkages
 ## Features:
 
 * Automatic linkage configuration detection (linkage-driven single pivot, Horst link, Split-pivot, VPP, DW/Maestro link)
-* Calculate linkage and rear axle positions based on main pivot rotation
-* Plot rear axle path
+* Calculate linkage, rear axle and instant center of rotation positions based on main pivot rotation
+* Plot rear axle and instant center of rotation paths
 * :warning: Absolutely not accurate
 
 ![4bar_analysis.png](4bar_analysis.png)
@@ -29,4 +29,3 @@ Mountain bike suspension analysis for four-bar linkages
 * Calculate shock rocker mount path
 * Calculate rear wheel/shock travel
 * Plot leverage curve (rear wheel travel/shock travel vs rear wheel travel)
-* Plot instant center of rotation vs main pivot rotation
