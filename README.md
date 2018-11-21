@@ -4,13 +4,14 @@ Mountain bike suspension analysis for four-bar linkages
 
 ## Usage:
 
-* Needs interactive Python shell (iPython, Spyder)
+* Needs an interactive Python shell (iPython, Spyder)
 * Add a bike picture (`.jpg`,`.jpeg`) to the  current directory
 * Run `4bar_analysis.py`
 
 ## Features:
 
 * Automatic linkage configuration detection (linkage-driven single pivot, Horst link, Split-pivot, VPP, DW/Maestro link)
+* Calculate linkage and rear axle positions based on main pivot rotation
 * Plot rear axle path
 * :warning: Absolutely not accurate
 
@@ -18,7 +19,7 @@ Mountain bike suspension analysis for four-bar linkages
 
 ## Python dependencies:
 
-* Python 3 (tested with Python 3.7.0)
+* Python 3 (tested with Python 3.7.0 and Spyder 3.3.1)
 * NumPy
 * SciPy
 * Matplotlib
@@ -27,4 +28,5 @@ Mountain bike suspension analysis for four-bar linkages
 
 * Calculate shock rocker mount path
 * Calculate rear wheel/shock travel
-* Plot leverage curve
+* Plot leverage curve (rear wheel travel/shock travel vs rear wheel travel)
+* Plot instant center of rotation vs main pivot rotation
