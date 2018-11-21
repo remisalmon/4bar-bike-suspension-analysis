@@ -16,6 +16,7 @@ Mountain bike suspension analysis for four-bar linkages
 * :warning: Absolutely not accurate
 
 ![4bar_analysis.png](4bar_analysis.png)
+(image source: https://www.santacruzbicycles.com/en-US/nomad)
 
 ## Python dependencies:
 
