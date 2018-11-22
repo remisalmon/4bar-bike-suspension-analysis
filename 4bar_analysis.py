@@ -226,7 +226,7 @@ plt.plot([points_xy[3, 0], points_xy[0, 0]], [points_xy[3, 1], points_xy[0, 1]],
 # calculate and plot rear axle path
 (theta1, theta2, theta3, theta4) = angles_4bar(points_xy)
 
-for theta1_new in np.linspace(theta1-math.radians(30), theta1+math.radians(30), 120): # y axis inverted = theta1 increases
+for theta1_new in np.linspace(theta1, theta1+math.radians(30), 100): # y axis inverted = theta1 increases
     ra_xy = ra_4bar(points_xy, theta1_new)
 
     plt.scatter(ra_xy[0], ra_xy[1], color = 'b', marker = '.')
@@ -238,7 +238,7 @@ plt.scatter(ic_xy[0], ic_xy[1], color = 'b', marker = 'o')
 plt.plot([points_xy[0, 0], ic_xy[0]], [points_xy[0, 1], ic_xy[1]], color = 'b', linestyle = '--')
 plt.plot([points_xy[3, 0], ic_xy[0]], [points_xy[3, 1], ic_xy[1]], color = 'b', linestyle = '--')
 
-for theta1_new in np.linspace(theta1, theta1+math.radians(45), 90): # y axis inverted = theta1 increases
+for theta1_new in np.linspace(theta1, theta1+math.radians(30), 100): # y axis inverted = theta1 increases
     points_xy_new = new_points_4bar(points_xy, theta1_new)
 
     ic_xy = ic_4bar(points_xy_new)
