@@ -107,6 +107,16 @@ def f_4bar(x, l1, l2, l3, l4, theta1, theta4): # vector loop function = [0, 0]
 
     return([fx, fy])
 
+def J_4bar(x, l1, l2, l3, l4, theta1, theta4): # Jacobian of vector loop function f
+    J = np.zeros((2, 2))
+    
+    J[0, 0] = l1*math.cos(theta1)-l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.cos(theta4)
+    J[0, 1] = l1*math.cos(theta1)+l2*math.cos(theta2)-l3*math.sin(theta3)+l4*math.cos(theta4)
+    J[1, 0] = l1*math.sin(theta1)+l2*math.cos(theta2)+l3*math.sin(theta3)+l4*math.sin(theta4)
+    J[1, 1] = l1*math.sin(theta1)+l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.sin(theta4)
+    
+    return(J)
+
 def angles_4bar(points_xy): # find angles between links
     (l1, l2, l3, l4) = l_4bar(points_xy)
 
@@ -124,7 +134,7 @@ def new_angles_4bar(points_xy, theta1_new): # find links angles with new theta1
 
     x0 = [theta2, theta3] # initial guess
 
-    sol = so.root(f_4bar, x0, args = (l1, l2, l3, l4, theta1_new, theta4), jac = False) # theta4 constant (l4 == frame)
+    sol = so.root(f_4bar, x0, args = (l1, l2, l3, l4, theta1_new, theta4), jac = J_4bar) # theta4 constant (l4 == frame)
 
     theta2_sol = sol.x[0]
     theta3_sol = sol.x[1]
