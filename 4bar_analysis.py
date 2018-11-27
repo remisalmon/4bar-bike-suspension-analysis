@@ -110,6 +110,9 @@ def f_4bar(x, l1, l2, l3, l4, theta1, theta4): # vector loop function = [0, 0]
     return(f)
 
 def J_4bar(x, l1, l2, l3, l4, theta1, theta4): # Jacobian of vector loop function f
+    theta2 = x[0]
+    theta3 = x[1]
+    
     J = np.zeros((2, 2))
     
     J[0, 0] = l1*math.cos(theta1)-l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.cos(theta4)
