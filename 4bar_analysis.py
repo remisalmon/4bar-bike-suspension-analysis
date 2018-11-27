@@ -104,22 +104,22 @@ def f_4bar(x, l1, l2, l3, l4, theta1, theta4): # vector loop function = [0, 0]
 
     fx = l1*math.cos(theta1)+l2*math.cos(theta2)+l3*math.cos(theta3)+l4*math.cos(theta4)
     fy = l1*math.sin(theta1)+l2*math.sin(theta2)+l3*math.sin(theta3)+l4*math.sin(theta4)
-    
+
     f = np.array([fx, fy])
-    
+
     return(f)
 
 def J_4bar(x, l1, l2, l3, l4, theta1, theta4): # Jacobian of vector loop function f
     theta2 = x[0]
     theta3 = x[1]
-    
+
     J = np.zeros((2, 2))
-    
+
     J[0, 0] = l1*math.cos(theta1)-l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.cos(theta4)
     J[0, 1] = l1*math.cos(theta1)+l2*math.cos(theta2)-l3*math.sin(theta3)+l4*math.cos(theta4)
     J[1, 0] = l1*math.sin(theta1)+l2*math.cos(theta2)+l3*math.sin(theta3)+l4*math.sin(theta4)
     J[1, 1] = l1*math.sin(theta1)+l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.sin(theta4)
-    
+
     return(J)
 
 def angles_4bar(points_xy): # find angles between links
@@ -144,12 +144,15 @@ def new_angles_4bar(points_xy, theta1_new): # find links angles with new theta1
     theta2_sol = sol.x[0]
     theta3_sol = sol.x[1]
 
-    return(theta1_new, theta2_sol, theta3_sol, theta4)
+    angles_new = [theta1_new, theta2_sol, theta3_sol, theta4]
 
-def new_points_4bar(points_xy, theta1_new): # find points coordinates with new theta1
+    return(angles_new)
+
+def new_points_4bar(points_xy, angles_new): # find points coordinates with new theta1
     (l1, l2, l3, l4) = l_4bar(points_xy)
 
-    (theta1_new, theta2_new, theta3_new, theta4_new) = new_angles_4bar(points_xy, theta1_new)
+    theta1_new = angles_new[0]
+    theta2_new = angles_new[1]
 
     points_xy_new = np.zeros(points_xy.shape)
 
@@ -160,33 +163,30 @@ def new_points_4bar(points_xy, theta1_new): # find points coordinates with new t
 
     return(points_xy_new)
 
-def ra_4bar(points_xy, theta1_new): # find rear axle coordinates from linkage points
+def ra_4bar(points_xy, points_xy_new, angles_new): # find rear axle coordinates from linkage points
     (l1, l2, l3, l4) = l_4bar(points_xy)
 
-    (theta1_new, theta2_new, theta3_new, theta4_new) = new_angles_4bar(points_xy, theta1_new)
-
-    points_xy_new = new_points_4bar(points_xy, theta1_new)
-
     v2 = [points_xy[2, 0]-points_xy[1, 0], points_xy[2, 1]-points_xy[1, 1]] # l2 vector
-    va = [points_xy[4, 0]-points_xy[1, 0], points_xy[4, 1]-points_xy[1, 1]] # rear axle-lower chainstay/seatstay pivot vector
+    vra = [points_xy[4, 0]-points_xy[1, 0], points_xy[4, 1]-points_xy[1, 1]] # rear axle-lower chainstay/seatstay pivot vector
 
-    a = np.linalg.norm(va) # distance to rear axle from lower chainstay/seatstay pivot
+    l = np.linalg.norm(vra) # distance to rear axle from lower chainstay/seatstay pivot
 
-    if a == 0:
-        a = 1 # avoid divide by 0 (can happen in Split-pivot configuration)
+    if l == 0: # avoid divide by 0 (Split-pivot configuration)
+        l = 1
 
-    cos_alpha = (v2[0]*va[0]+v2[1]*va[1])/(l2*a) # l2 = norm(v2)
-    sin_alpha = (v2[0]*va[1]-va[0]*v2[1])/(l2*a) # l2 = norm(v2)
+    cos_alpha = (v2[0]*vra[0]+v2[1]*vra[1])/(l2*l) # l2 = norm(v2)
+    sin_alpha = (v2[0]*vra[1]-vra[0]*v2[1])/(l2*l) # l2 = norm(v2)
 
     alpha = math.atan2(sin_alpha, cos_alpha) # angle to rear axle from l2 (constant)
 
-    x = points_xy_new[1, 0]+a*math.cos(theta2_new+alpha)
-    y = points_xy_new[1, 1]+a*math.sin(theta2_new+alpha)
+    theta2_new = angles_new[1]
+
+    x = points_xy_new[1, 0]+l*math.cos(theta2_new+alpha)
+    y = points_xy_new[1, 1]+l*math.sin(theta2_new+alpha)
 
     return(x, y)
 
 def ic_4bar(points_xy): # find coordinates of instant center of rotation = intersection of the 2 rotating links l1, l3
-    # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_the_equations_of_the_lines
     a = (points_xy[1, 1]-points_xy[0, 1])/(points_xy[1, 0]-points_xy[0, 0]) # l1 slope
     c = points_xy[0, 1]-a*points_xy[0, 0] # l1 offset
     b = (points_xy[3, 1]-points_xy[2, 1])/(points_xy[3, 0]-points_xy[2, 0]) # l3 slope
@@ -195,7 +195,7 @@ def ic_4bar(points_xy): # find coordinates of instant center of rotation = inter
     if a == b:
         ic = [-1, -1] # avoid divide by 0 (should not happen...)
     else:
-        ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)]
+        ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)] # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_the_equations_of_the_lines
 
     return(ic)
 
@@ -226,14 +226,6 @@ plt.plot([points_xy[1, 0], points_xy[2, 0]], [points_xy[1, 1], points_xy[2, 1]],
 plt.plot([points_xy[2, 0], points_xy[3, 0]], [points_xy[2, 1], points_xy[3, 1]], color = 'r')
 plt.plot([points_xy[3, 0], points_xy[0, 0]], [points_xy[3, 1], points_xy[0, 1]], color = 'r', linestyle = '--')
 
-# calculate and plot rear axle path
-(theta1, theta2, theta3, theta4) = angles_4bar(points_xy)
-
-for theta1_new in np.linspace(theta1, theta1+math.radians(30), 100): # y axis inverted = theta1 increases
-    ra_xy = ra_4bar(points_xy, theta1_new)
-
-    plt.scatter(ra_xy[0], ra_xy[1], color = 'b', marker = '.')
-
 ## calculate and plot instant center of rotation
 ic_xy = ic_4bar(points_xy)
 
@@ -241,11 +233,17 @@ plt.scatter(ic_xy[0], ic_xy[1], color = 'b', marker = 'o')
 plt.plot([points_xy[0, 0], ic_xy[0]], [points_xy[0, 1], ic_xy[1]], color = 'b', linestyle = '--')
 plt.plot([points_xy[3, 0], ic_xy[0]], [points_xy[3, 1], ic_xy[1]], color = 'b', linestyle = '--')
 
-for theta1_new in np.linspace(theta1, theta1+math.radians(30), 100): # y axis inverted = theta1 increases
-    points_xy_new = new_points_4bar(points_xy, theta1_new)
+# calculate and plot rear axle and instant center of rotation paths
+(theta1, theta2, theta3, theta4) = angles_4bar(points_xy)
 
+for theta1_new in np.linspace(theta1, theta1+math.radians(30), 90): # y axis inverted = theta1 increases
+    angles_new = new_angles_4bar(points_xy, theta1_new)
+    points_xy_new = new_points_4bar(points_xy, angles_new)
+
+    ra_xy = ra_4bar(points_xy, points_xy_new, angles_new)
     ic_xy = ic_4bar(points_xy_new)
 
+    plt.scatter(ra_xy[0], ra_xy[1], color = 'r', marker = '.')
     plt.scatter(ic_xy[0], ic_xy[1], color = 'b', marker = '.')
 
 plt.xlim(xlim)
