@@ -1,12 +1,13 @@
 # 4bar-bike-suspension-analysis
 
-Mountain bike suspension analysis for four-bar linkages
+Mountain bike suspension analysis for four-bar linkages: rear wheel and instant center of rotation paths
 
 ## Usage:
 
-* Needs an interactive Python shell (iPython, Spyder)
-* Add a bike picture (`.jpg`,`.jpeg`) to the  current directory
-* Run `4bar_analysis.py`
+* Add a bike picture (`.jpg`,`.jpeg`) to the current directory
+* Run `python3 4bar_analysis.py`
+* Follow the instructions on the image
+* The analysis plot `4bar_analysis.png` is saved to the current directory
 
 ## Features:
 
@@ -20,10 +21,10 @@ Mountain bike suspension analysis for four-bar linkages
 
 ## Python dependencies:
 
-* Python 3 (tested with Python 3.7.0 and Spyder 3.3.1)
-* NumPy
-* SciPy
-* Matplotlib
+* Python >= 3.7.1
+* NumPy >= 1.15.4
+* SciPy >= 1.1.0
+* Matplotlib >= 2.2.2
 
 ## ToDo:
 
