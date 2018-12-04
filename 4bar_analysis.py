@@ -5,11 +5,8 @@ Remi Salmon, 2018
 salmon.remi@gmail.com
 """
 
-#!/usr/bin/env python3
-
 # imports
 import glob
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as so
@@ -102,8 +99,8 @@ def f_4bar(x, l1, l2, l3, l4, theta1, theta4): # vector loop function = [0, 0]
     theta2 = x[0]
     theta3 = x[1]
 
-    fx = l1*math.cos(theta1)+l2*math.cos(theta2)+l3*math.cos(theta3)+l4*math.cos(theta4)
-    fy = l1*math.sin(theta1)+l2*math.sin(theta2)+l3*math.sin(theta3)+l4*math.sin(theta4)
+    fx = l1*np.cos(theta1)+l2*np.cos(theta2)+l3*np.cos(theta3)+l4*np.cos(theta4)
+    fy = l1*np.sin(theta1)+l2*np.sin(theta2)+l3*np.sin(theta3)+l4*np.sin(theta4)
 
     f = np.array([fx, fy])
 
@@ -115,20 +112,20 @@ def J_4bar(x, l1, l2, l3, l4, theta1, theta4): # Jacobian of vector loop functio
 
     J = np.zeros((2, 2))
 
-    J[0, 0] = l1*math.cos(theta1)-l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.cos(theta4)
-    J[0, 1] = l1*math.cos(theta1)+l2*math.cos(theta2)-l3*math.sin(theta3)+l4*math.cos(theta4)
-    J[1, 0] = l1*math.sin(theta1)+l2*math.cos(theta2)+l3*math.sin(theta3)+l4*math.sin(theta4)
-    J[1, 1] = l1*math.sin(theta1)+l2*math.sin(theta2)+l3*math.cos(theta3)+l4*math.sin(theta4)
+    J[0, 0] = l1*np.cos(theta1)-l2*np.sin(theta2)+l3*np.cos(theta3)+l4*np.cos(theta4)
+    J[0, 1] = l1*np.cos(theta1)+l2*np.cos(theta2)-l3*np.sin(theta3)+l4*np.cos(theta4)
+    J[1, 0] = l1*np.sin(theta1)+l2*np.cos(theta2)+l3*np.sin(theta3)+l4*np.sin(theta4)
+    J[1, 1] = l1*np.sin(theta1)+l2*np.sin(theta2)+l3*np.cos(theta3)+l4*np.sin(theta4)
 
     return(J)
 
 def angles_4bar(points_xy): # find angles between links
     (l1, l2, l3, l4) = l_4bar(points_xy)
 
-    theta1 = math.atan2(points_xy[1, 1]-points_xy[0, 1], points_xy[1, 0]-points_xy[0, 0]) # l1 angle
-    theta2 = math.atan2(points_xy[2, 1]-points_xy[1, 1], points_xy[2, 0]-points_xy[1, 0]) # l2 angle
-    theta3 = math.atan2(points_xy[3, 1]-points_xy[2, 1], points_xy[3, 0]-points_xy[2, 0]) # l3 angle
-    theta4 = math.atan2(points_xy[0, 1]-points_xy[3, 1], points_xy[0, 0]-points_xy[3, 0]) # l4 angle
+    theta1 = np.arctan2(points_xy[1, 1]-points_xy[0, 1], points_xy[1, 0]-points_xy[0, 0]) # l1 angle
+    theta2 = np.arctan2(points_xy[2, 1]-points_xy[1, 1], points_xy[2, 0]-points_xy[1, 0]) # l2 angle
+    theta3 = np.arctan2(points_xy[3, 1]-points_xy[2, 1], points_xy[3, 0]-points_xy[2, 0]) # l3 angle
+    theta4 = np.arctan2(points_xy[0, 1]-points_xy[3, 1], points_xy[0, 0]-points_xy[3, 0]) # l4 angle
 
     return(theta1, theta2, theta3, theta4)
 
@@ -157,8 +154,8 @@ def new_points_4bar(points_xy, angles_new): # find points coordinates with new t
     points_xy_new = np.zeros(points_xy.shape)
 
     points_xy_new[0, :] = points_xy[0, :]
-    points_xy_new[1, :] = points_xy_new[0, :]+[l1*math.cos(theta1_new), l1*math.sin(theta1_new)]
-    points_xy_new[2, :] = points_xy_new[1, :]+[l2*math.cos(theta2_new), l2*math.sin(theta2_new)]
+    points_xy_new[1, :] = points_xy_new[0, :]+[l1*np.cos(theta1_new), l1*np.sin(theta1_new)]
+    points_xy_new[2, :] = points_xy_new[1, :]+[l2*np.cos(theta2_new), l2*np.sin(theta2_new)]
     points_xy_new[3, :] = points_xy[3, :]
 
     return(points_xy_new)
@@ -177,12 +174,12 @@ def ra_4bar(points_xy, points_xy_new, angles_new): # find rear axle coordinates 
     cos_alpha = (v2[0]*vra[0]+v2[1]*vra[1])/(l2*l) # l2 = norm(v2)
     sin_alpha = (v2[0]*vra[1]-vra[0]*v2[1])/(l2*l) # l2 = norm(v2)
 
-    alpha = math.atan2(sin_alpha, cos_alpha) # angle to rear axle from l2 (constant)
+    alpha = np.arctan2(sin_alpha, cos_alpha) # angle to rear axle from l2 (constant)
 
     theta2_new = angles_new[1]
 
-    x = points_xy_new[1, 0]+l*math.cos(theta2_new+alpha)
-    y = points_xy_new[1, 1]+l*math.sin(theta2_new+alpha)
+    x = points_xy_new[1, 0]+l*np.cos(theta2_new+alpha)
+    y = points_xy_new[1, 1]+l*np.sin(theta2_new+alpha)
 
     return(x, y)
 
@@ -195,7 +192,7 @@ def ic_4bar(points_xy): # find coordinates of instant center of rotation = inter
     if a == b:
         ic = [-1, -1] # avoid divide by 0 (should not happen...)
     else:
-        ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)] # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_the_equations_of_the_lines
+        ic = [(d-c)/(a-b), (a*d-b*c)/(a-b)] # (cf. https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_the_equations_of_the_lines)
 
     return(ic)
 
@@ -236,7 +233,7 @@ plt.plot([points_xy[3, 0], ic_xy[0]], [points_xy[3, 1], ic_xy[1]], color = 'b', 
 # calculate and plot rear axle and instant center of rotation paths
 (theta1, theta2, theta3, theta4) = angles_4bar(points_xy)
 
-for theta1_new in np.linspace(theta1, theta1+math.radians(30), 90): # y axis inverted = theta1 increases
+for theta1_new in np.linspace(theta1, theta1+np.radians(30), 90): # y axis inverted = theta1 increases
     angles_new = new_angles_4bar(points_xy, theta1_new)
     points_xy_new = new_points_4bar(points_xy, angles_new)
 
